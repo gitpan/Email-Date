@@ -1,3 +1,7 @@
+1.02    2004-07-25
+
+  - s/gmtime/localtime/
+
 1.01    2004-07-17
 
   - Initial Revision.

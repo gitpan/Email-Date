@@ -1,9 +1,9 @@
 package Email::Date;
-# $Id: Date.pm,v 1.1 2004/07/17 18:56:26 cwest Exp $
+# $Id: Date.pm,v 1.2 2004/07/25 20:21:14 cwest Exp $
 use strict;
 
 use vars qw[$VERSION @EXPORT];
-$VERSION = sprintf "%d.%02d", split m/\./, (qw$Revision: 1.1 $)[1];
+$VERSION = sprintf "%d.%02d", split m/\./, (qw$Revision: 1.2 $)[1];
 @EXPORT  = qw[find_date format_date];
 
 use base qw[Exporter];
@@ -91,7 +91,7 @@ of C<time> is used.
 
 sub format_date {
     my $time = shift || time;
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday) = (gmtime $time)[0..6];
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday) = (localtime $time)[0..6];
     my $day   = (qw[Sun Mon Tue Wed Thu Fri Sat])[$wday];
     my $month = (qw[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec])[$mon];
     $year += 1900;

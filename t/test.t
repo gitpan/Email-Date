@@ -10,5 +10,5 @@ cmp_ok $date[-2], '>', 100, 'format_date returned something parsable';
 my $date = find_date(<<__MESSAGE__);
 Resent-Date: Tue, 6 Jul 2004 16:11:06 -0400
 __MESSAGE__
-is $date->year, 2004, 'find_date looked hard and found one';
-is $date->tzoffset, -14400, 'time zone, too';
+
+isa_ok $date, 'Time::Piece';
