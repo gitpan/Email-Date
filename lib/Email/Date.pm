@@ -1,14 +1,13 @@
 package Email::Date;
-# $Id: Date.pm,v 1.2 2004/07/25 20:21:14 cwest Exp $
+# $Id: Date.pm,v 1.3 2004/09/24 00:00:48 cwest Exp $
 use strict;
 
 use vars qw[$VERSION @EXPORT];
-$VERSION = sprintf "%d.%02d", split m/\./, (qw$Revision: 1.2 $)[1];
+$VERSION = sprintf "%d.%02d", split m/\./, (qw$Revision: 1.3 $)[1];
 @EXPORT  = qw[find_date format_date];
 
 use base qw[Exporter];
 use Date::Parse;
-use Email::Abstract;
 use Email::Simple;
 use Time::Piece;
 use Time::Local;
@@ -63,11 +62,19 @@ L<Time::Piece|Time::Piece> object.
 =cut
 
 sub find_date {
-    my ($email) = Email::Abstract->cast(shift, 'Email::Simple');
+    my ($email) = _get_simple_object($_[0]);
     my $date = $email->header('Date')
                 || _find_date_received($email->header('Recieved'))
                   || $email->header('Resent-Date');
     Time::Piece->new(str2time $date);
+}
+
+sub _get_simple_object {
+    my ($email) = @_;
+    return $email if UNIVERSAL::isa($email, 'Email::Simple');
+    return Email::Simple->new($email) if ! ref($email);
+    require Email::Abstract;
+    return Email::Abstract->cast($email, 'Email::Simple');
 }
 
 sub _find_date_received {
