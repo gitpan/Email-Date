@@ -2,13 +2,12 @@ package Email::Date;
 use strict;
 
 use vars qw[$VERSION @EXPORT @EXPORT_OK];
-$VERSION = '1.101';
+$VERSION = '1.102';
 @EXPORT    = qw[find_date format_date];
 @EXPORT_OK = qw[format_gmdate];
 
 use base qw[Exporter];
 use Date::Parse ();
-use Email::Simple;
 use Time::Piece ();
 use Time::Local ();
 
@@ -72,13 +71,13 @@ sub find_date {
             || _find_date_received($email->get_header('Received'))
             || $email->get_header('Resent-Date');
 
-    return unless length $date;
+    return unless $date and length $date;
 
     Time::Piece->new(Date::Parse::str2time $date);
 }
 
 sub _find_date_received {
-    return unless length $_[0];
+    return unless defined $_[0] and length $_[0];
     my $date = pop;
     $date =~ s/.+;//;
     $date;
@@ -157,7 +156,7 @@ __END__
 
 This module is maintained by the Perl Email Project
 
-  L<http://emailproject.perl.org/wiki/Email::Date>
+L<http://emailproject.perl.org/wiki/Email::Date>
 
 =head1 SEE ALSO
 
