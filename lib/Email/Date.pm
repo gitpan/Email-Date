@@ -1,67 +1,19 @@
-package Email::Date;
 use strict;
+use warnings;
+package Email::Date;
+{
+  $Email::Date::VERSION = '1.104';
+}
+# ABSTRACT: Find and Format Date Headers
 
-use vars qw[$VERSION @EXPORT @EXPORT_OK];
-$VERSION = '1.103';
-@EXPORT    = qw[find_date format_date];
-@EXPORT_OK = qw[format_gmdate];
+our @EXPORT    = qw[find_date format_date];
+our @EXPORT_OK = qw[format_gmdate];
 
-use base qw[Exporter];
-use Date::Parse ();
-use Email::Date::Format;
-use Time::Piece ();
+use Exporter 5.57 'import';
+use Date::Parse 2.27 ();
+use Email::Date::Format 1.000;
+use Time::Piece 1.08 ();
 
-=head1 NAME
-
-Email::Date - Find and Format Date Headers
-
-=head1 SYNOPSIS
-
-  use Email::Date;
-  
-  my $email = join '', <>;
-  my $date  = find_date($email);
-  print $date->ymd;
-  
-  my $header = format_date($date->epoch);
-  
-  Email::Simple->create(
-      header => [
-          Date => $header,
-      ],
-      body => '...',
-  );
-
-=head1 DESCRIPTION
-
-RFC 2822 defines the C<Date:> header. It declares the header a required
-part of an email message. The syntax for date headers is clearly laid
-out. Stil, even a perfectly planned world has storms. The truth is, many
-programs get it wrong. Very wrong. Or, they don't include a C<Date:> header
-at all. This often forces you to look elsewhere for the date, and hoping
-to find something.
-
-For this reason, the tedious process of looking for a valid date has been
-encapsulated in this software. Further, the process of creating RFC
-compliant date strings is also found in this software.
-
-=head2 FUNCTIONS
-
-=over 4
-
-=item find_date
-
-  my $time_piece = find_date $email;
-
-C<find_date> accepts an email message in any format
-L<Email::Abstract|Email::Abstract> can understand. It looks through the email
-message and finds a date, converting it to a L<Time::Piece|Time::Piece> object.
-
-If it can't find a date, it returns false.
-
-C<find_date> is exported by default.
-
-=cut
 
 sub find_date {
     require Email::Abstract;
@@ -83,7 +35,75 @@ sub _find_date_received {
     $date;
 }
 
-=item format_date
+
+BEGIN {
+  *format_date   = \&Email::Date::Format::email_date;
+  *format_gmdate = \&Email::Date::Format::email_gmdate;
+};
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Email::Date - Find and Format Date Headers
+
+=head1 VERSION
+
+version 1.104
+
+=head1 SYNOPSIS
+
+  use Email::Date;
+  
+  my $email = join '', <>;
+  my $date  = find_date($email);
+  print $date->ymd;
+  
+  my $header = format_date($date->epoch);
+  
+  Email::Simple->create(
+      header => [
+          Date => $header,
+      ],
+      body => '...',
+  );
+
+=head1 DESCRIPTION
+
+B<Achtung!>  Probably you'll be find just using L<Email::Date::Format> to
+produce dates or L<Date::Parse> to parse dates.  This module isn't much needed
+anymore, but does provide C<find_date>, described below.
+
+RFC 2822 defines the C<Date:> header. It declares the header a required
+part of an email message. The syntax for date headers is clearly laid
+out. Stil, even a perfectly planned world has storms. The truth is, many
+programs get it wrong. Very wrong. Or, they don't include a C<Date:> header
+at all. This often forces you to look elsewhere for the date, and hoping
+to find something.
+
+For this reason, the tedious process of looking for a valid date has been
+encapsulated in this software. Further, the process of creating RFC
+compliant date strings is also found in this software.
+
+=head1 FUNCTIONS
+
+=head2 find_date
+
+  my $time_piece = find_date $email;
+
+C<find_date> accepts an email message in any format
+L<Email::Abstract|Email::Abstract> can understand. It looks through the email
+message and finds a date, converting it to a L<Time::Piece|Time::Piece> object.
+
+If it can't find a date, it returns false.
+
+C<find_date> is exported by default.
+
+=head2 format_date
 
   my $date = format_date; # now
   my $date = format_date( time - 60*60 ); # one hour ago
@@ -95,7 +115,7 @@ of C<time> is used.
 
 C<format_date> is exported by default.
 
-=item format_gmdate
+=head2 format_gmdate
 
   my $date = format_gmdate;
 
@@ -104,42 +124,25 @@ indicating the time in Greenwich Mean Time, rather than local time.
 
 C<format_gmdate> is exported on demand, but not by default.
 
-=cut
+=head1 AUTHORS
 
-BEGIN {
-  *format_date   = \&Email::Date::Format::email_date;
-  *format_gmdate = \&Email::Date::Format::email_gmdate;
-};
+=over 4
 
-1;
+=item *
 
-__END__
+Casey West
+
+=item *
+
+Ricardo SIGNES <rjbs@cpan.org>
 
 =back
 
-=head1 PERL EMAIL PROJECT
+=head1 COPYRIGHT AND LICENSE
 
-This module is maintained by the Perl Email Project
+This software is copyright (c) 2004 by Casey West.
 
-L<http://emailproject.perl.org/wiki/Email::Date>
-
-=head1 SEE ALSO
-
-L<Email::Abstract>,
-L<Time::Piece>,
-L<Date::Parse>,
-L<perl>.
-
-=head1 AUTHOR
-
-Casey West, <F<casey@geeknest.com>>.
-
-Ricardo SIGNES, <F<rjbs@cpan.org>>.
-
-=head1 COPYRIGHT
-
-  Copyright (c) 2004 Casey West.  All rights reserved.
-  This module is free software; you can redistribute it and/or modify it
-  under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
